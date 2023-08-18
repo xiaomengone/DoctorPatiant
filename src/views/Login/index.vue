@@ -6,6 +6,7 @@ import { apiLogin, apiGetCode, apiCodeLogin } from "@/services/user";
 import { useUserStore } from "@/stores";
 import { useRoute, useRouter } from "vue-router";
 import { onUnmounted } from "vue";
+import CpIcon from "@/components/CpIcon.vue";
 
 const mobile = ref("");
 const password = ref("");
@@ -20,6 +21,7 @@ const secondCode = ref(0); //倒计时时间
 const sendVerificationcode = ref(true);
 const refSendCode = ref<FormInstance>();
 let interIime: number;
+const showPassword = ref(false);
 // 登录按钮
 const onSubmit = async () => {
   if (checked.value == true) {
@@ -61,6 +63,9 @@ const sendCode = async () => {
 onUnmounted(() => {
   clearInterval(interIime);
 });
+const changeShowPassword = () => {
+  showPassword.value = !showPassword.value;
+};
 </script>
 
 <template>
@@ -91,10 +96,17 @@ onUnmounted(() => {
       <van-field
         v-if="isPassword"
         placeholder="请输入密码"
-        type="password"
+        :type="showPassword ? 'text' : 'password'"
         v-model="password"
         :rules="passwordRules"
-      ></van-field>
+      >
+        <template #button>
+          <CpIcon
+            :name="showPassword ? 'login-eye-on' : 'login-eye-off'"
+            @click="changeShowPassword"
+          ></CpIcon>
+        </template>
+      </van-field>
       <van-field
         v-else
         placeholder="请输入验证码"
