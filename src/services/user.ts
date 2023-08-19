@@ -3,6 +3,7 @@ import type {
   User,
   DistinguishingVerificationCode,
   userInfo,
+  PatientList,
 } from "@/types/user";
 
 const apiLogin = (mobile: string, password: string) => {
@@ -27,4 +28,8 @@ const apiCodeLogin = (mobile: string, code: string) => {
 const apiGetMyTop = () => {
   return request<userInfo>("/patient/myUser", "GET");
 };
-export { apiLogin, apiGetCode, apiCodeLogin, apiGetMyTop };
+// 家庭档案
+const apiGetPatientMylist = () => {
+  return request<PatientList>("/patient/mylist", "GET");
+};
+export { apiLogin, apiGetCode, apiCodeLogin, apiGetMyTop, apiGetPatientMylist };
