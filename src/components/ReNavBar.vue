@@ -5,6 +5,7 @@ const props = defineProps<{
   leftText?: string;
   rightText?: string;
   title?: string;
+  back?: () => void;
 }>();
 const emit = defineEmits<{
   (e: "navClickRight"): void;
@@ -14,6 +15,7 @@ const onClickRight = () => {
 };
 const router = useRouter();
 const onClickLeft = () => {
+  if (props.back) return props.back();
   if (history.state?.back) {
     router.go(-1);
   } else router.push("/");

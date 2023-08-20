@@ -4,6 +4,7 @@ import type {
   DistinguishingVerificationCode,
   userInfo,
   PatientList,
+  AddPatient,
 } from "@/types/user";
 
 const apiLogin = (mobile: string, password: string) => {
@@ -32,4 +33,20 @@ const apiGetMyTop = () => {
 const apiGetPatientMylist = () => {
   return request<PatientList>("/patient/mylist", "GET");
 };
-export { apiLogin, apiGetCode, apiCodeLogin, apiGetMyTop, apiGetPatientMylist };
+// 添加患者
+const apiPostAddPatiant = (patiant: AddPatient) => {
+  return request<{ id: string }>("/patient/add", "POST", {
+    name: patiant.name,
+    idCard: patiant.idCard,
+    defaultFlag: patiant.defaultFlag,
+    gender: patiant.gender,
+  });
+};
+export {
+  apiLogin,
+  apiGetCode,
+  apiCodeLogin,
+  apiGetMyTop,
+  apiGetPatientMylist,
+  apiPostAddPatiant,
+};

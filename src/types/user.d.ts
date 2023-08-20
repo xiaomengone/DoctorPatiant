@@ -59,3 +59,8 @@ export type Patient = {
 
 // 家庭档案-患者信息列表
 export type PatientList = Patient[];
+// 添加患者
+export type AddPatient = Pick<
+  Patient,
+  "name" | "idCard" | "defaultFlag" | "gender"
+>;

@@ -1,21 +1,61 @@
 <script setup lang="ts">
-import { apiGetPatientMylist } from "@/services/user";
+import { apiGetPatientMylist, apiPostAddPatiant } from "@/services/user";
 import { ref } from "vue";
 import { onMounted } from "vue";
 import type { PatientList } from "@/types/user";
 import { useRouter } from "vue-router";
+import type { AddPatient } from "@/types/user";
+import { computed } from "vue";
+import { rulerAddPatiant, rulerIdcard } from "@/utils/rules";
+import { showToast, type FormInstance } from "vant";
 
 const patientList = ref<PatientList>();
-const router = useRouter();
 const showRight = ref(false);
+const optionList = [
+  { label: "男", value: 1 },
+  { label: "女", value: 0 },
+];
+const gender = ref(0);
+const initPatientMsg: AddPatient = {
+  name: "",
+  idCard: "",
+  defaultFlag: 0,
+  gender: 1,
+};
+const patientMsg = ref<AddPatient>({
+  ...initPatientMsg,
+});
+const form = ref<FormInstance>();
 
+//查询所有患者
 const getPatientList = async () => {
   const res = await apiGetPatientMylist();
   patientList.value = res.data;
 };
 const addPatient = () => {
   showRight.value = true;
+  patientMsg.value = { ...initPatientMsg };
 };
+const back = () => {
+  showRight.value = false;
+};
+const onSubmit = async () => {
+  await form.value?.validate();
+  if (+patientMsg.value.idCard.slice(-2, -1) % 2 !== patientMsg.value.gender) {
+    return showToast("请选择正确的性别");
+  }
+  await apiPostAddPatiant(patientMsg.value);
+  showRight.value = false;
+  getPatientList();
+};
+const defaultFlag = computed({
+  get: () => {
+    return patientMsg.value.defaultFlag == 1 ? true : false;
+  },
+  set: (value) => {
+    return (patientMsg.value.defaultFlag = value ? 1 : 0);
+  },
+});
 onMounted(() => {
   getPatientList();
 });
@@ -47,8 +87,43 @@ onMounted(() => {
     <van-popup
       v-model:show="showRight"
       position="right"
-      :style="{ width: '30%', height: '100%' }"
-    />
+      :style="{ width: '90%', height: '100%' }"
+    >
+      <ReNavBar
+        title="添加患者"
+        rightText="保存"
+        :back="back"
+        @navClickRight="onSubmit"
+      ></ReNavBar>
+      <van-form autocomplete="off" ref="form">
+        <van-field
+          label="真实姓名"
+          placeholder="请输入真实姓名"
+          v-model="patientMsg.name"
+          :rules="rulerAddPatiant"
+        />
+        <van-field
+          label="身份证号"
+          placeholder="请输入身份证号"
+          v-model="patientMsg.idCard"
+          :rules="rulerIdcard"
+        />
+        <van-field label="性别" class="pb4">
+          <!-- 单选按钮组件 -->
+          <template #input>
+            <CpRadioBtn
+              :optionList="optionList"
+              v-model="patientMsg.gender"
+            ></CpRadioBtn>
+          </template>
+        </van-field>
+        <van-field label="默认就诊人">
+          <template #input>
+            <van-checkbox :icon-size="18" round v-model="defaultFlag" />
+          </template>
+        </van-field>
+      </van-form>
+    </van-popup>
   </div>
 </template>
 

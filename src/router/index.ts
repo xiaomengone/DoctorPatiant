@@ -59,13 +59,6 @@ const router = createRouter({
         title: "家庭档案",
       },
     },
-    {
-      path: "/user/addPatient",
-      component: () => import("@/views/User/AddPatient.vue"),
-      meta: {
-        title: "添加患者",
-      },
-    },
   ],
 });
 //路由前置守卫控制权限
