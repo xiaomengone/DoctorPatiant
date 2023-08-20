@@ -42,6 +42,21 @@ const apiPostAddPatiant = (patiant: AddPatient) => {
     gender: patiant.gender,
   });
 };
+// 编辑患者信息
+const apiEditPatiant = (patiant: AddPatient) => {
+  request<{ id: string }>("/patient/update", "PUT", {
+    name: patiant.name,
+    idCard: patiant.idCard,
+    defaultFlag: patiant.defaultFlag,
+    id: patiant.id,
+    gender: patiant.gender,
+  });
+};
+const apiDeletePatiant = (id: string | undefined) => {
+  return request<{
+    id: string;
+  }>(`/patient/del/${id}`, "DELETE");
+};
 export {
   apiLogin,
   apiGetCode,
@@ -49,4 +64,6 @@ export {
   apiGetMyTop,
   apiGetPatientMylist,
   apiPostAddPatiant,
+  apiEditPatiant,
+  apiDeletePatiant,
 };

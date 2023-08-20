@@ -63,4 +63,4 @@ export type PatientList = Patient[];
 export type AddPatient = Pick<
   Patient,
   "name" | "idCard" | "defaultFlag" | "gender"
->;
+> & { id?: string };

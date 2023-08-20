@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { apiGetPatientMylist, apiPostAddPatiant } from "@/services/user";
+import {
+  apiGetPatientMylist,
+  apiPostAddPatiant,
+  apiEditPatiant,
+  apiDeletePatiant,
+} from "@/services/user";
 import { ref } from "vue";
 import { onMounted } from "vue";
 import type { PatientList } from "@/types/user";
@@ -7,7 +12,12 @@ import { useRouter } from "vue-router";
 import type { AddPatient } from "@/types/user";
 import { computed } from "vue";
 import { rulerAddPatiant, rulerIdcard } from "@/utils/rules";
-import { showToast, type FormInstance } from "vant";
+import {
+  showToast,
+  type FormInstance,
+  showConfirmDialog,
+  showDialog,
+} from "vant";
 
 const patientList = ref<PatientList>();
 const showRight = ref(false);
@@ -32,22 +42,49 @@ const getPatientList = async () => {
   const res = await apiGetPatientMylist();
   patientList.value = res.data;
 };
-const addPatient = () => {
-  showRight.value = true;
-  patientMsg.value = { ...initPatientMsg };
+const addPatient = (item: AddPatient) => {
+  if (item) {
+    showRight.value = true;
+    const { name, idCard, defaultFlag, gender, id } = item;
+    patientMsg.value = {
+      name,
+      idCard,
+      defaultFlag,
+      gender,
+      id,
+    };
+  } else {
+    patientMsg.value = { ...initPatientMsg };
+    form.value?.resetValidation();
+  }
 };
 const back = () => {
   showRight.value = false;
 };
+// 顶部保存按钮
 const onSubmit = async () => {
   await form.value?.validate();
   if (+patientMsg.value.idCard.slice(-2, -1) % 2 !== patientMsg.value.gender) {
     return showToast("请选择正确的性别");
   }
-  await apiPostAddPatiant(patientMsg.value);
+  patientMsg.value.id
+    ? await apiEditPatiant(patientMsg.value)
+    : await apiPostAddPatiant(patientMsg.value);
   showRight.value = false;
+  showDialog({
+    title: "温馨提示",
+    message: "成功修改信息",
+  }).then(() => {
+    getPatientList();
+  });
+};
+const deletePatiant = async () => {
+  await apiDeletePatiant(patientMsg.value.id);
+  showRight.value = false;
+  showToast("删除成功");
   getPatientList();
 };
+
 const defaultFlag = computed({
   get: () => {
     return patientMsg.value.defaultFlag == 1 ? true : false;
@@ -74,7 +111,9 @@ onMounted(() => {
           <span>{{ item.gender }}</span>
           <span>{{ item.age }}岁</span>
         </div>
-        <div class="icon"><cp-icon name="user-edit" /></div>
+        <div class="icon">
+          <cp-icon name="user-edit" @click="addPatient(item)" />
+        </div>
         <div class="tag" v-if="item.defaultFlag">默认</div>
       </div>
       <div class="patient-add" v-if="patientList!?.length < 6">
@@ -90,7 +129,7 @@ onMounted(() => {
       :style="{ width: '90%', height: '100%' }"
     >
       <ReNavBar
-        title="添加患者"
+        :title="patientMsg.id ? '修改信息' : '添加患者'"
         rightText="保存"
         :back="back"
         @navClickRight="onSubmit"
@@ -123,6 +162,11 @@ onMounted(() => {
           </template>
         </van-field>
       </van-form>
+      <van-action-bar v-if="patientMsg.id">
+        <van-action-bar-button @click="deletePatiant"
+          >删除</van-action-bar-button
+        >
+      </van-action-bar>
     </van-popup>
   </div>
 </template>
@@ -208,5 +252,13 @@ onMounted(() => {
 }
 .pb4 {
   padding-bottom: 4px;
+}
+.van-action-bar {
+  padding: 0 10px;
+  margin-bottom: 10px;
+  .van-button {
+    color: var(--cp-price);
+    background-color: var(--cp-bg);
+  }
 }
 </style>
