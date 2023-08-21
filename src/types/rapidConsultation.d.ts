@@ -12,8 +12,8 @@ export type patientInformation = {
   patientId: string;
   depId: string;
   illnessDesc: string;
-  illnessTime: number;
-  consultFlag: 0 | 1;
+  illnessTime: number | undefined;
+  consultFlag: 0 | 1 | undefined;
   liverFunction: enumLiverFunction;
   renalFunction: enumLiverFunction;
   allergicHistory: number;

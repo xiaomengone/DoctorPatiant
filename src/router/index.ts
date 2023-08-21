@@ -77,7 +77,7 @@ const router = createRouter({
       path: "/consult/illness",
       component: () => import("@/views/consult/ConsultIllness.vue"),
       meta: {
-        title: "病情描述",
+        title: "图文问诊",
       },
     },
   ],

@@ -4,6 +4,13 @@ export enum enumConsultationConsultation {
   rapidConsultation,
   MedicationConsultation,
 }
+export enum enumIlnessTime {
+  // 患病时间
+  week = 1,
+  months,
+  halfYear,
+  year,
+}
 export enum enumLiverFunction {
   normal = 0,
   abnormal,

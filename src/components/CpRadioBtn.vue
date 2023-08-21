@@ -4,7 +4,7 @@ const props = defineProps<{
     label: string;
     value: number | string;
   }[];
-  modelValue: number | string;
+  modelValue: number | string | undefined;
 }>();
 const emit = defineEmits<{
   (e: "update:modelValue", gender: string | number): void;

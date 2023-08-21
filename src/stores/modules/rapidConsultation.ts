@@ -17,9 +17,24 @@ export const useRapidConsult = defineStore(
       return (patientInformation.value.illnessType = illnessType);
     };
     const setDep = (depId: string) => {
+      // 选择科室
       return (patientInformation.value.depId = depId);
     };
-    return { patientInformation, setType, setIllnessType, setDep };
+    const setInquiriesImagesText = (e: partialPatientInformation) => {
+      // 图文问诊
+      patientInformation.value.illnessDesc = e.illnessDesc;
+      patientInformation.value.illnessTime = e.illnessTime;
+      patientInformation.value.consultFlag = e.consultFlag;
+      patientInformation.value.pictures = e.pictures;
+    };
+
+    return {
+      setInquiriesImagesText,
+      patientInformation,
+      setType,
+      setIllnessType,
+      setDep,
+    };
   },
   {
     persist: true,
