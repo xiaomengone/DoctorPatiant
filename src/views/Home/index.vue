@@ -2,8 +2,11 @@
 import { ref } from "vue";
 import KnowledgeList from "@/views/Home/components/KnowledgeList.vue";
 import FollowDoctors from "@/views/Home/components/FollowDoctors.vue";
+import { useRapidConsult } from "@/stores";
+import { enumConsultationConsultation } from "@/enums";
 
 const active = ref(1);
+const store = useRapidConsult();
 </script>
 
 <template>
@@ -27,7 +30,10 @@ const active = ref(1);
             <p class="desc">按科室查问医生</p>
           </router-link>
         </van-col>
-        <van-col span="8">
+        <van-col
+          span="8"
+          @click="store.setType(enumConsultationConsultation.rapidConsultation)"
+        >
           <router-link to="/consult/fast" class="nav">
             <cp-icon name="home-graphic"></cp-icon>
             <p class="title">极速问诊</p>
