@@ -1,8 +1,8 @@
 export enum enumConsultationConsultation {
   // 就诊类型
   consultDoctor = 1,
-  rapidConsultation,
-  MedicationConsultation,
+  rapidConsultation = 2,
+  MedicationConsultation = 3,
 }
 export enum enumIlnessTime {
   // 患病时间

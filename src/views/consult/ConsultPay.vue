@@ -3,33 +3,45 @@ import { useRapidConsult } from "@/stores";
 import type {
   QeqOrderpreType,
   resOrderpreTypeItem,
+  reqPaymentMethod,
 } from "@/types/rapidConsultation";
 import type { Patient } from "@/types/user";
 import {
   apiGetPreOrder,
   apiGetPatientInfo,
   apiPostConsultorder,
+  apiPostConsultPay,
 } from "@/services/rapidConsultation";
 import { onMounted } from "vue";
 import { ref } from "vue";
-import { showToast } from "vant";
+import { showConfirmDialog, showToast } from "vant";
+import { onBeforeRouteLeave } from "vue-router";
+import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 
 const store = useRapidConsult();
 const { type, illnessType } = store.patientInformation;
-const paramsPreOrder = {
-  type,
-  illnessType,
-};
+const paramsPreOrder = ref<QeqOrderpreType>({
+  type: type || 1,
+  illnessType: illnessType || 1,
+});
 const preOrderIMG = ref<resOrderpreTypeItem>();
 const patientMsg = ref<Patient>();
 const agree = ref<boolean>(false);
 const show = ref<boolean>(false);
 const orderGoodsId = ref<string>(); //订单ID
-const paymentMethod = ref<number>(); //支付方式
+const paymentMethod = ref<0 | 1>(1); //支付方式
+const payUrl = ref<string>(); //回跳地址
+const router = useRouter();
+const reqPostConsultPay = ref<reqPaymentMethod>({
+  orderId: "",
+  paymentMethod: 1,
+  payCallback: "",
+});
 
 // 获取预支付信息
-const getPreOrderIMG = async (paramsPreOrd: QeqOrderpreType) => {
-  const res = await apiGetPreOrder(paramsPreOrd);
+const getPreOrderIMG = async (e: QeqOrderpreType) => {
+  const res = await apiGetPreOrder(e);
   preOrderIMG.value = res.data;
   store.patientInformation.couponId = res.data.couponId;
 };
@@ -44,14 +56,41 @@ const next = async () => {
     const res = await apiPostConsultorder(store.patientInformation);
     orderGoodsId.value = res.data.id;
     store.deletePatientInformation();
+    reqPostConsultPay.value.orderId = orderGoodsId.value;
+    reqPostConsultPay.value.payCallback = "http:localhost:5173/consult/room"; //回跳地址，问诊页面
+    reqPostConsultPay.value.paymentMethod = paymentMethod.value || 1;
+    const resPayUrl = await apiPostConsultPay(reqPostConsultPay.value);
+    payUrl.value = resPayUrl.data.payUrl;
+    window.location.href = payUrl.value;
+    // router.push("");
   } else {
     showToast("请勾选用户协议");
   }
 };
+const closeProp = () => {
+  showConfirmDialog({
+    title: "温馨提示",
+    message: "取消支付将无法获得医生回复，医生接诊名额有限，是否确认关闭？",
+    cancelButtonText: "狠心离开",
+    confirmButtonText: "继续支付",
+  })
+    .then(() => {
+      return false;
+    })
+    .catch(() => {
+      orderGoodsId.value = "";
+      // 跳转到问诊记录
+      router.push("/user/consult");
+      return true;
+    });
+};
 
 onMounted(() => {
-  getPreOrderIMG(paramsPreOrder);
+  getPreOrderIMG(paramsPreOrder.value);
   getPatianMsg(store.patientInformation?.patientId || "");
+});
+onBeforeRouteLeave(() => {
+  if (orderGoodsId.value) return false;
 });
 </script>
 
@@ -101,7 +140,13 @@ onMounted(() => {
       @click="next"
     />
     <!-- 支付面板 -->
-    <van-action-sheet v-model:show="show" title="选择支付方式">
+    <van-action-sheet
+      v-model:show="show"
+      title="选择支付方式"
+      :closeable="false"
+      :close-on-popstate="false"
+      :before-close="closeProp"
+    >
       <div class="pay-type">
         <p class="amount">￥{{ preOrderIMG.actualPayment.toFixed(2) }}</p>
         <van-cell-group>
@@ -128,6 +173,12 @@ onMounted(() => {
     <ReNavBar title="支付"></ReNavBar>
     <van-skeleton title :row="8" />
   </div>
+  <!-- 遮罩层 -->
+  <van-overlay :show="show" @click="show = false">
+    <div class="wrapper" @click.stop>
+      <div class="block" />
+    </div>
+  </van-overlay>
 </template>
 
 <style lang="scss" scoped>
@@ -216,5 +267,17 @@ onMounted(() => {
       font-size: 16px;
     }
   }
+}
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.block {
+  width: 120px;
+  height: 120px;
+  background-color: #fff;
 }
 </style>

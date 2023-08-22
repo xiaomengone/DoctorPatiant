@@ -87,6 +87,17 @@ const router = createRouter({
         title: "预支付",
       },
     },
+    {
+      path: "/consult/room",
+      component: () => import("@/views/Room/index.vue"),
+      meta: {
+        title: "问诊是",
+      },
+      // 如果加载失败，跳转到问诊记录界面
+      beforeEnter(to) {
+        if (to.query.payResult === "false") return "/user/consult";
+      },
+    },
   ],
 });
 //路由前置守卫控制权限

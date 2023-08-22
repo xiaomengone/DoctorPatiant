@@ -5,6 +5,7 @@ import type {
   QeqOrderpreType,
   resOrderpreTypeItem,
   partialPatientInformation,
+  reqPaymentMethod,
 } from "@/types/rapidConsultation";
 
 const apiGetDepAll = () => {
@@ -27,9 +28,12 @@ const apiGetPatientInfo = (id: string) => {
   return request<Patient>(`/patient/info/${id}`);
 };
 const apiPostConsultorder = (e: partialPatientInformation) => {
+  // 生成订单id
   return request<{ id: string }>("/patient/consult/order", "POST", e);
 };
-// 生承订单id
+const apiPostConsultPay = (e: reqPaymentMethod) => {
+  return request<{ payUrl: string }>("/patient/consult/pay", "POST", e);
+};
 
 export {
   apiGetDepAll,
@@ -37,4 +41,5 @@ export {
   apiGetPreOrder,
   apiGetPatientInfo,
   apiPostConsultorder,
+  apiPostConsultPay,
 };

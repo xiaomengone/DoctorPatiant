@@ -3,7 +3,7 @@ import type {
   enumConsultationConsultation,
   enumLiverFunction,
   enumFertilityStatus,
-} from "@/types/rapidConsultation";
+} from "@/enums";
 
 export type patientInformation = {
   type: enumConsultationConsultation;
@@ -48,4 +48,9 @@ export type resOrderpreTypeItem = {
   couponDeduction: number;
   couponId: string;
   actualPayment: number;
+};
+export type reqPaymentMethod = {
+  paymentMethod: 0 | 1;
+  orderId: string;
+  payCallback: string;
 };
