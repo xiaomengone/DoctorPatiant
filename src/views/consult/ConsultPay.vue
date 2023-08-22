@@ -62,7 +62,6 @@ const next = async () => {
     const resPayUrl = await apiPostConsultPay(reqPostConsultPay.value);
     payUrl.value = resPayUrl.data.payUrl;
     window.location.href = payUrl.value;
-    // router.push("");
   } else {
     showToast("请勾选用户协议");
   }
