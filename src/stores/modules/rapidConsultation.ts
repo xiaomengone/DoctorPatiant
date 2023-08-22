@@ -27,6 +27,17 @@ export const useRapidConsult = defineStore(
       patientInformation.value.consultFlag = e.consultFlag;
       patientInformation.value.pictures = e.pictures;
     };
+    const setPatiantId = (id: string) => {
+      // 患者id
+      patientInformation.value.patientId = id;
+    };
+    const setcouponId = (id: string) => {
+      patientInformation.value.couponId = id;
+    };
+
+    const deletePatientInformation = () => {
+      patientInformation.value = {};
+    };
 
     return {
       setInquiriesImagesText,
@@ -34,6 +45,9 @@ export const useRapidConsult = defineStore(
       setType,
       setIllnessType,
       setDep,
+      setPatiantId,
+      setcouponId,
+      deletePatientInformation,
     };
   },
   {

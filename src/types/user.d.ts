@@ -54,13 +54,16 @@ export type Patient = {
   /** 性别文字 */
   genderValue: string;
   /** 年龄 */
-  age: number;
+  age?: number;
 };
 
 // 家庭档案-患者信息列表
 export type PatientList = Patient[];
 // 添加患者
-export type AddPatient = Pick<
-  Patient,
-  "name" | "idCard" | "defaultFlag" | "gender"
-> & { id?: string };
+export type AddPatient = {
+  name: string;
+  idCard: string;
+  gender: 0 | 1;
+  id?: string;
+  defaultFlag: 0 | 1;
+};

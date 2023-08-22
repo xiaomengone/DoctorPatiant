@@ -18,6 +18,8 @@ import {
   showConfirmDialog,
   showDialog,
 } from "vant";
+import { useRoute } from "vue-router";
+import { useRapidConsult } from "@/stores";
 
 const patientList = ref<PatientList>();
 const showRight = ref(false);
@@ -36,11 +38,20 @@ const patientMsg = ref<AddPatient>({
   ...initPatientMsg,
 });
 const form = ref<FormInstance>();
+const route = useRoute();
+const selectedClass = ref(false);
+const selectId = ref<string>();
+const store = useRapidConsult();
+const router = useRouter();
 
 //查询所有患者
 const getPatientList = async () => {
   const res = await apiGetPatientMylist();
   patientList.value = res.data;
+  if (!selectId.value) {
+    // 默认选中的样式
+    selectId.value = patientList.value[0].id;
+  }
 };
 const addPatient = (item: AddPatient) => {
   if (item) {
@@ -67,16 +78,25 @@ const onSubmit = async () => {
   if (+patientMsg.value.idCard.slice(-2, -1) % 2 !== patientMsg.value.gender) {
     return showToast("请选择正确的性别");
   }
-  patientMsg.value.id
-    ? await apiEditPatiant(patientMsg.value)
-    : await apiPostAddPatiant(patientMsg.value);
-  showRight.value = false;
-  showDialog({
-    title: "温馨提示",
-    message: "成功修改信息",
-  }).then(() => {
-    getPatientList();
-  });
+  if (patientMsg.value.id) {
+    const res = await apiEditPatiant(patientMsg.value);
+    showRight.value = false;
+    showDialog({
+      title: "温馨提示",
+      message: "成功修改信息",
+    }).then(() => {
+      getPatientList();
+    });
+  } else {
+    await apiPostAddPatiant(patientMsg.value);
+    showRight.value = false;
+    showDialog({
+      title: "温馨提示",
+      message: "添加成功",
+    }).then(() => {
+      getPatientList();
+    });
+  }
 };
 const deletePatiant = async () => {
   await apiDeletePatiant(patientMsg.value.id);
@@ -93,16 +113,36 @@ const defaultFlag = computed({
     return (patientMsg.value.defaultFlag = value ? 1 : 0);
   },
 });
+const selectItem = (item: AddPatient) => {
+  selectId.value = item.id;
+};
+const next = () => {
+  store.setPatiantId(selectId.value || "");
+  router.push("/consult/consultPay");
+};
 onMounted(() => {
   getPatientList();
+});
+const isConsultation = computed(() => {
+  return !!route.query.isChange;
 });
 </script>
 
 <template>
   <div class="patient-page">
-    <ReNavBar title="家庭档案"></ReNavBar>
+    <ReNavBar :title="isConsultation ? '选择患者' : '家庭档案'"></ReNavBar>
+    <div class="patient-change" v-if="isConsultation">
+      <h3>请选择患者信息</h3>
+      <p>以便医生给出更准确的治疗，信息仅医生可见</p>
+    </div>
     <div class="patient-list">
-      <div class="patient-item" v-for="item in patientList" :key="item.id">
+      <div
+        class="patient-item"
+        v-for="item in patientList"
+        :key="item.id"
+        @click="selectItem(item)"
+        :class="{ selected: item.id == selectId ? true : false }"
+      >
         <div class="info">
           <span class="name">{{ item.name }}</span>
           <span class="id">{{
@@ -112,7 +152,7 @@ onMounted(() => {
           <span>{{ item.age }}岁</span>
         </div>
         <div class="icon">
-          <cp-icon name="user-edit" @click="addPatient(item)" />
+          <cp-icon name="user-edit" @click.stop="addPatient(item)" />
         </div>
         <div class="tag" v-if="item.defaultFlag">默认</div>
       </div>
@@ -121,6 +161,9 @@ onMounted(() => {
         <p>添加患者</p>
       </div>
       <div class="patient-tip">最多可添加 6 人</div>
+    </div>
+    <div class="patient-next" v-if="isConsultation">
+      <van-button type="primary" round block @click="next">下一步</van-button>
     </div>
     <!-- 点击添加患者后的弹窗 -->
     <van-popup
@@ -260,5 +303,25 @@ onMounted(() => {
     color: var(--cp-price);
     background-color: var(--cp-bg);
   }
+}
+.patient-change {
+  padding: 15px;
+  > h3 {
+    font-weight: normal;
+    margin-bottom: 5px;
+  }
+  > p {
+    color: var(--cp-text3);
+  }
+}
+.patient-next {
+  padding: 15px;
+  background-color: #fff;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  box-sizing: border-box;
 }
 </style>

@@ -19,6 +19,7 @@ export type patientInformation = {
   allergicHistory: number;
   fertilityStatus: enumFertilityStatus;
   docId: string;
+  couponId: string;
   medicines: { id: string; quantity: number }[];
   pictures: { id: string; url: string }[];
 };
@@ -33,4 +34,18 @@ export type typeDepAll = {
   id: string;
   name: string;
   child: typeChild[];
+};
+// 预支付
+export type QeqOrderpreType = {
+  type: enumConsultationConsultation;
+  illnessType?: 0 | 1;
+};
+export type resOrderpreTypeItem = {
+  type?: enumConsultationConsultation;
+  illnessType?: 0 | 1;
+  payment: number;
+  pointDeduction: number;
+  couponDeduction: number;
+  couponId: string;
+  actualPayment: number;
 };

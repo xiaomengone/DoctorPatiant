@@ -80,6 +80,13 @@ const router = createRouter({
         title: "图文问诊",
       },
     },
+    {
+      path: "/consult/consultPay",
+      component: () => import("@/views/consult/ConsultPay.vue"),
+      meta: {
+        title: "预支付",
+      },
+    },
   ],
 });
 //路由前置守卫控制权限
