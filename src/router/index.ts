@@ -91,11 +91,18 @@ const router = createRouter({
       path: "/consult/room",
       component: () => import("@/views/Room/index.vue"),
       meta: {
-        title: "问诊是",
+        title: "问诊室",
       },
       // 如果加载失败，跳转到问诊记录界面
       beforeEnter(to) {
         if (to.query.payResult === "false") return "/user/consult";
+      },
+    },
+    {
+      path: "/user/consult",
+      component: () => import("@/views/User/ConsultPage.vue"),
+      meta: {
+        title: "问诊记录",
       },
     },
   ],

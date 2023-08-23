@@ -22,3 +22,14 @@ export enum enumFertilityStatus {
   Pregnant,
   lactation,
 }
+
+export enum EnumStateValue {
+  // 订单的不同状态
+  toBePaid = 1, //等支付
+  waitingForConsultation = 2, //待接诊
+  inConsultation = 3, //咨询中
+  completed = 4, //已完成
+  canceled = 5, //已取消
+  toBeShipped = 11, //待发货
+  toBeReceived = 12, //待收货
+}

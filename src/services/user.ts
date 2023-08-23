@@ -6,6 +6,7 @@ import type {
   PatientList,
   AddPatient,
 } from "@/types/user";
+import type { TyepReqOrderList, TypeOrderList } from "@/types/consultPage";
 
 const apiLogin = (mobile: string, password: string) => {
   return request<User>("/login/password", "POST", {
@@ -57,6 +58,9 @@ const apiDeletePatiant = (id: string | undefined) => {
     id: string;
   }>(`/patient/del/${id}`, "DELETE");
 };
+const apiGetOrderList = (e: TyepReqOrderList) => {
+  return request<TypeOrderList>("/patient/consult/order/list", "GET", e);
+};
 export {
   apiLogin,
   apiGetCode,
@@ -66,4 +70,5 @@ export {
   apiPostAddPatiant,
   apiEditPatiant,
   apiDeletePatiant,
+  apiGetOrderList,
 };
