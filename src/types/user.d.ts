@@ -66,4 +66,6 @@ export type AddPatient = {
   gender: 0 | 1;
   id?: string;
   defaultFlag: 0 | 1;
+  genderValue?: string;
+  age?: number;
 };

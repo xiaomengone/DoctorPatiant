@@ -2,13 +2,19 @@
 import { ref } from "vue";
 import ConsultList from "./components/ConsultList.vue";
 import { enumConsultationConsultation } from "@/enums";
+import { useRouter } from "vue-router";
 
 const active = ref<enumConsultationConsultation>(1);
+const router = useRouter();
+
+const back = () => {
+  router.push("/user");
+};
 </script>
 
 <template>
   <div class="consult-page">
-    <ReNavBar title="问诊记录" />
+    <ReNavBar title="问诊记录" :back="back" />
     <van-tabs sticky v-model:active="active">
       <van-tab
         title="极速问诊"

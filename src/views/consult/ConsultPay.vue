@@ -59,9 +59,6 @@ const next = async () => {
     reqPostConsultPay.value.orderId = orderGoodsId.value;
     reqPostConsultPay.value.payCallback = "http:localhost:5173/consult/room"; //回跳地址，问诊页面
     reqPostConsultPay.value.paymentMethod = paymentMethod.value || 1;
-    const resPayUrl = await apiPostConsultPay(reqPostConsultPay.value);
-    payUrl.value = resPayUrl.data.payUrl;
-    window.location.href = payUrl.value;
   } else {
     showToast("请勾选用户协议");
   }
@@ -82,6 +79,12 @@ const closeProp = () => {
       router.push("/user/consult");
       return true;
     });
+};
+const onImmediatePayment = () => {
+  apiPostConsultPay(reqPostConsultPay.value).then((resPayUrl) => {
+    payUrl.value = resPayUrl.data.payUrl;
+    window.location.href = payUrl.value;
+  });
 };
 
 onMounted(() => {
@@ -131,6 +134,7 @@ onBeforeRouteLeave(() => {
         >我已同意 <span class="text">支付协议</span></van-checkbox
       >
     </div>
+    <!-- 第一个立即支付 -->
     <van-submit-bar
       button-type="primary"
       :price="preOrderIMG.actualPayment * 100"
@@ -163,7 +167,9 @@ onBeforeRouteLeave(() => {
           </van-cell>
         </van-cell-group>
         <div class="btn">
-          <van-button type="primary" round block>立即支付</van-button>
+          <van-button type="primary" round block @click="onImmediatePayment"
+            >立即支付</van-button
+          >
         </div>
       </div>
     </van-action-sheet>
@@ -172,12 +178,6 @@ onBeforeRouteLeave(() => {
     <ReNavBar title="支付"></ReNavBar>
     <van-skeleton title :row="8" />
   </div>
-  <!-- 遮罩层 -->
-  <van-overlay :show="show" @click="show = false">
-    <div class="wrapper" @click.stop>
-      <div class="block" />
-    </div>
-  </van-overlay>
 </template>
 
 <style lang="scss" scoped>

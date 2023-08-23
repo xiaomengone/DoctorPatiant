@@ -37,6 +37,7 @@ const initPatientMsg: AddPatient = {
 const patientMsg = ref<AddPatient>({
   ...initPatientMsg,
 });
+
 const form = ref<FormInstance>();
 const route = useRoute();
 const selectedClass = ref(false);
@@ -53,8 +54,10 @@ const getPatientList = async () => {
     selectId.value = patientList.value[0].id;
   }
 };
-const addPatient = (item: AddPatient) => {
+// 点击添加或编辑图标
+const addPatient = (item?: AddPatient) => {
   if (item) {
+    // item中的编辑按钮
     showRight.value = true;
     const { name, idCard, defaultFlag, gender, id } = item;
     patientMsg.value = {
@@ -65,7 +68,16 @@ const addPatient = (item: AddPatient) => {
       id,
     };
   } else {
-    patientMsg.value = { ...initPatientMsg };
+    // 添加患者按钮
+    showRight.value = true;
+    patientMsg.value = {
+      name: " ",
+      idCard: " ",
+      defaultFlag: 0,
+      gender: 1,
+      id: " ",
+    };
+    // patientMsg.value = patientMsg.value;
     form.value?.resetValidation();
   }
 };
@@ -79,6 +91,7 @@ const onSubmit = async () => {
     return showToast("请选择正确的性别");
   }
   if (patientMsg.value.id) {
+    console.log("修改", patientMsg.value);
     const res = await apiEditPatiant(patientMsg.value);
     showRight.value = false;
     showDialog({
@@ -88,6 +101,8 @@ const onSubmit = async () => {
       getPatientList();
     });
   } else {
+    console.log("添加", patientMsg.value);
+    patientMsg.value.defaultFlag = initPatientMsg.defaultFlag;
     await apiPostAddPatiant(patientMsg.value);
     showRight.value = false;
     showDialog({
@@ -105,6 +120,13 @@ const deletePatiant = async () => {
   getPatientList();
 };
 
+const selectItem = (item: AddPatient) => {
+  selectId.value = item.id;
+};
+const next = () => {
+  store.setPatiantId(selectId.value || "");
+  router.push("/consult/consultPay");
+};
 const defaultFlag = computed({
   get: () => {
     return patientMsg.value.defaultFlag == 1 ? true : false;
@@ -113,13 +135,7 @@ const defaultFlag = computed({
     return (patientMsg.value.defaultFlag = value ? 1 : 0);
   },
 });
-const selectItem = (item: AddPatient) => {
-  selectId.value = item.id;
-};
-const next = () => {
-  store.setPatiantId(selectId.value || "");
-  router.push("/consult/consultPay");
-};
+
 onMounted(() => {
   getPatientList();
 });
