@@ -25,7 +25,9 @@ const getConsultFlag = (time: number) => {
     return item.value == time;
   })?.label;
 };
+
 const clickLook = (
+  // 病情描述卡片的查看图片
   pickTrue: {
     id: string;
     url: string;
@@ -37,6 +39,7 @@ const clickLook = (
   showImagePreview(newArr);
 };
 const originalPrescription = async (id: string) => {
+  //查看医生原始处方
   const res = await apiGetPrescription(id);
   console.log("res", res.data.url);
   showImagePreview([res.data.url]);

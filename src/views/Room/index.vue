@@ -66,7 +66,7 @@ onMounted(() => {
       arr.push(...item.items);
       list.value.unshift(...arr);
     });
-    list.value = arr;
+    // list.value = arr;
     console.log(2, arr);
     if (initialMsg.value) {
       nextTick(() => {
@@ -83,6 +83,7 @@ onMounted(() => {
 });
 
 const ongetMsg = (text: string) => {
+  // 子组件向父组件传递消息
   // 发送信息需要  发送人  收消息人  消息类型  消息内容
   socket.emit("sendChatMsg", {
     from: store.user?.id,
@@ -90,16 +91,8 @@ const ongetMsg = (text: string) => {
     msgType: MsgType.MsgText,
     msg: { content: text },
   });
-  // 接收消息 在onMounted注册
-  socket.on("receiveChatMsg", async (event) => {
-    list.value.push(event);
-    await nextTick();
-    window.scrollTo(0, document.body.scrollHeight);
-  });
 };
 const sendImage = (img: { id: string; url: string }) => {
-  console.log("父组件", img);
-
   socket.emit("sendChatMsg", {
     from: store.user?.id,
     to: consult.value?.docInfo?.id,
@@ -108,6 +101,13 @@ const sendImage = (img: { id: string; url: string }) => {
   });
 };
 
+onMounted(() => {
+  socket.on("receiveChatMsg", async (event) => {
+    list.value.push(event);
+    await nextTick();
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+});
 onUnmounted(() => {
   // 关闭连接
   socket.close();
