@@ -91,7 +91,6 @@ const onSubmit = async () => {
     return showToast("请选择正确的性别");
   }
   if (patientMsg.value.id) {
-    console.log("修改", patientMsg.value);
     const res = await apiEditPatiant(patientMsg.value);
     showRight.value = false;
     showDialog({
@@ -101,7 +100,6 @@ const onSubmit = async () => {
       getPatientList();
     });
   } else {
-    console.log("添加", patientMsg.value);
     patientMsg.value.defaultFlag = initPatientMsg.defaultFlag;
     await apiPostAddPatiant(patientMsg.value);
     showRight.value = false;

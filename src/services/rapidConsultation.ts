@@ -1,5 +1,6 @@
 import { request } from "@/utils/request";
 import type { Patient } from "@/types/user";
+import type { ConsultOrderItem } from "@/types/consultPage";
 import type {
   typeDepAll,
   QeqOrderpreType,
@@ -34,12 +35,22 @@ const apiPostConsultorder = (e: partialPatientInformation) => {
 const apiPostConsultPay = (e: reqPaymentMethod) => {
   return request<{ payUrl: string }>("/patient/consult/pay", "POST", e);
 };
+const getConsultOrderDetail = (orderId: string) =>
+  request<ConsultOrderItem>("/patient/consult/order/detail", "GET", {
+    orderId,
+  });
+// 查询处方单
+const apiGetPrescription = (id: string) => {
+  return request<{ url: string }>(`/patient/consult/prescription/${id}`);
+};
 
 export {
+  getConsultOrderDetail,
   apiGetDepAll,
   apiPostUpload,
   apiGetPreOrder,
   apiGetPatientInfo,
   apiPostConsultorder,
   apiPostConsultPay,
+  apiGetPrescription,
 };

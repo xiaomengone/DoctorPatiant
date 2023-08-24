@@ -12,35 +12,7 @@ import { useRapidConsult } from "@/stores";
 import type { partialPatientInformation } from "@/types/rapidConsultation";
 import { useRouter } from "vue-router";
 import { onMounted } from "vue";
-
-const optionList = [
-  {
-    label: "一周内",
-    value: enumIlnessTime.week,
-  },
-  {
-    label: "一月内",
-    value: enumIlnessTime.months,
-  },
-  {
-    label: "半年内",
-    value: enumIlnessTime.halfYear,
-  },
-  {
-    label: "半年以上",
-    value: enumIlnessTime.year,
-  },
-];
-const consultFlagList = [
-  {
-    label: "未就诊",
-    value: 0,
-  },
-  {
-    label: "就诊过",
-    value: 1,
-  },
-];
+import { consultFlagList, optionList } from "@/services/constants";
 
 const illnessDsp = ref<partialPatientInformation>({
   illnessTime: 1,

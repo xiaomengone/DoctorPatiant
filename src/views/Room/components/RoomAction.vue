@@ -1,4 +1,33 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { apiPostUpload } from "@/services/rapidConsultation";
+import { Toast } from "vant";
+import type { UploaderAfterRead } from "vant/lib/uploader/types";
+import { ref } from "vue";
+
+const text = ref<string>();
+defineProps<{
+  disabled: boolean;
+}>();
+const emit = defineEmits<{
+  (e: "getMsg", text: string): void;
+  (e: "send-image", image: { id: string; url: string }): void;
+}>();
+const sendMsg = () => {
+  emit("getMsg", text.value || "");
+  text.value = "";
+};
+
+const sendImage: UploaderAfterRead = async (data) => {
+  console.log(1111);
+
+  if (Array.isArray(data)) return;
+  if (!data.file) return;
+  const t = Toast.loading("正在上传");
+  const res = await apiPostUpload(data.file);
+  t.close();
+  emit("send-image", res.data);
+};
+</script>
 
 <template>
   <div class="room-action">
@@ -8,9 +37,15 @@
       :border="false"
       placeholder="问医生"
       autocomplete="off"
-      :disabled="true"
+      :disabled="disabled"
+      v-model="text"
+      @keyup.enter="sendMsg"
     ></van-field>
-    <van-uploader :preview-image="false" :disabled="true">
+    <van-uploader
+      :preview-image="false"
+      :disabled="true"
+      :after-read="sendImage"
+    >
       <cp-icon name="consult-img" />
     </van-uploader>
   </div>
