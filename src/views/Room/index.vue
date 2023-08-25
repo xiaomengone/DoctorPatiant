@@ -15,6 +15,7 @@ import { ref } from "vue";
 import type { ConsultOrderItem } from "@/types/consultPage";
 import { getConsultOrderDetail } from "@/services/rapidConsultation";
 import { nextTick } from "vue";
+import { provide } from "vue";
 
 const store = useUserStore();
 let socket: Socket;
@@ -22,15 +23,26 @@ const route = useRoute();
 const router = useRouter();
 const list = ref<Message[]>([]);
 const initialMsg = ref(true);
+const orderId = route.query.orderId;
+const consult = ref<ConsultOrderItem>();
+provide("consult", consult);
 
 const back = () => {
   router.push("/user");
 };
-const consult = ref<ConsultOrderItem>();
 const loadConsult = async () => {
   const res = await getConsultOrderDetail(route.query.orderId as string);
   consult.value = res.data;
+  console.log("res.data", res.data);
 };
+const completeEva = (score: number) => {
+  const item = list.value.find((item) => item.msgType === MsgType.CardEvaForm);
+  if (item) {
+    item.msg.evaluateDoc = { score };
+    item.msgType = MsgType.CardEva;
+  }
+};
+provide("completeEva", completeEva);
 
 onMounted(() => {
   loadConsult();

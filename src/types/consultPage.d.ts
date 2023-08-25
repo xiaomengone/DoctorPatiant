@@ -94,3 +94,12 @@ export type ConsultOrderItem = Consult & {
   /** 实付款 */
   actualPayment: number;
 };
+
+// 评价医生
+export type TypeOrderEvaluate = {
+  docId: string;
+  orderId: string;
+  score: number;
+  content: string;
+  anonymousFlag: number;
+};

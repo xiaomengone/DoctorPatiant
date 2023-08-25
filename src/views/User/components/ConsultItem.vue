@@ -30,6 +30,7 @@ defineProps<{
         <div class="body-value tip">{{ item.createTime }}</div>
       </div>
     </div>
+    <!-- 不同状态，下面的操作不同 -->
     <!-- 待支付状态 -->
     <div class="foot" v-if="item.status === EnumStateValue.toBePaid">
       <van-button class="gray" plain size="small" round>取消问诊</van-button>

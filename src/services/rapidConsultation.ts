@@ -1,6 +1,6 @@
 import { request } from "@/utils/request";
 import type { Patient } from "@/types/user";
-import type { ConsultOrderItem } from "@/types/consultPage";
+import type { ConsultOrderItem, TypeOrderEvaluate } from "@/types/consultPage";
 import type {
   typeDepAll,
   QeqOrderpreType,
@@ -43,8 +43,19 @@ const getConsultOrderDetail = (orderId: string) =>
 const apiGetPrescription = (id: string) => {
   return request<{ url: string }>(`/patient/consult/prescription/${id}`);
 };
+// 评价接口
+const apiOrderEvaluate = (e: TypeOrderEvaluate) => {
+  request<{ id: string }>("/patient/order/evaluate", "POST", {
+    docId: e.docId,
+    orderId: e.orderId,
+    score: e.score,
+    content: e.content,
+    anonymousFlag: e.anonymousFlag,
+  });
+};
 
 export {
+  apiOrderEvaluate,
   getConsultOrderDetail,
   apiGetDepAll,
   apiPostUpload,
