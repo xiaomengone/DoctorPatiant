@@ -7,6 +7,7 @@ import { useUserStore } from "@/stores";
 import { useRoute, useRouter } from "vue-router";
 import { onUnmounted } from "vue";
 import CpIcon from "@/components/CpIcon.vue";
+import { onMounted } from "vue";
 
 const mobile = ref("");
 const password = ref("");
@@ -66,6 +67,10 @@ onUnmounted(() => {
 const changeShowPassword = () => {
   showPassword.value = !showPassword.value;
 };
+onMounted(() => {
+  mobile.value = "13230000021";
+  password.value = "abc12345";
+});
 </script>
 
 <template>
