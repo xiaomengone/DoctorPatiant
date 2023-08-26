@@ -8,7 +8,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "originalPrescription", id: string): void; //查看处方
-  (e: "onDeleteOrder", id: TypeOrderItem): void; //删除处方
+  (e: "onDeleteOrder", item: TypeOrderItem): void; //删除处方
 }>();
 const { originalPrescription } = useLookPrescription();
 const showPopover = ref(false);

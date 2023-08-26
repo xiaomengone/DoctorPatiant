@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { OrderType } from "@/enums";
+import { EnumStateValue, OrderType } from "@/enums";
+import ConsultMore from "@/components/ConsultMore.vue";
 import {
   apiGetPrescription,
   getConsultOrderDetail,
@@ -10,10 +11,33 @@ import { computed } from "vue";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { getIllnessTime, getConsultFlag } from "@/utils/filter";
+import {
+  useCancelConsultation,
+  useLookPrescription,
+  useOnDeleteOrder,
+} from "@/composables";
+import { useRouter } from "vue-router";
+import { useClipboard } from "@vueuse/core";
+import { showToast } from "vant";
 
+const { cancelConsultation, loading } = useCancelConsultation();
+const { originalPrescription } = useLookPrescription();
 const item = ref<TypeOrderItem>();
 const route = useRoute();
+const router = useRouter();
 const itemId = route.query.itemId;
+const { onDeleteOrder, loading: deleteLoading } = useOnDeleteOrder(() => {
+  router.push("/user/consult");
+});
+const { text, copy, copied, isSupported } = useClipboard(); //复制
+
+const onCopy = async () => {
+  if (!isSupported.value) {
+    return showToast("未经授权，不支持");
+  }
+  await copy(item.value?.orderNo!);
+  showToast("已复制");
+};
 
 onMounted(async () => {
   console.log("itemId", Object.prototype.toString.call(itemId));
@@ -70,7 +94,7 @@ computed(() => {
       <van-cell-group :border="false">
         <van-cell title="订单编号">
           <template #value>
-            <span class="copy">复制</span>
+            <span class="copy" @click="onCopy">复制</span>
             {{ item.orderNo }}
           </template>
         </van-cell>
@@ -85,16 +109,95 @@ computed(() => {
         />
       </van-cell-group>
     </div>
-    <!-- <div class="detail-time">
-      请在 <van-count-down :time="10000 * 1000" /> 内完成支付，超时订单将取消
-    </div> -->
-    <div class="detail-action van-hairline--top">
+    <!-- 等支付 -->
+    <div class="detail-time" v-if="item.status === EnumStateValue.toBePaid">
+      请在
+      <van-count-down :time="(item.countdown || 0) * 1000" />
+      内完成支付，超时订单将取消
+    </div>
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === EnumStateValue.toBePaid"
+    >
       <div class="price">
         <span>需付款</span>
-        <span>￥39.00</span>
+        <span>￥{{ item.actualPayment.toFixed(2) }}</span>
       </div>
-      <van-button type="default" round>取消问诊</van-button>
+      <van-button
+        type="default"
+        round
+        :loading="loading"
+        @click="cancelConsultation(item)"
+        >取消问诊</van-button
+      >
       <van-button type="primary" round>继续支付</van-button>
+    </div>
+    <!-- 待接诊 -->
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === EnumStateValue.waitingForConsultation"
+    >
+      <van-button
+        type="default"
+        round
+        :loading="loading"
+        @click="cancelConsultation(item)"
+        >取消问诊</van-button
+      >
+      <van-button type="primary" round :to="`/room?orderId=${item.id}`"
+        >继续沟通</van-button
+      >
+    </div>
+    <!-- 咨询中 -->
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === EnumStateValue.inConsultation"
+    >
+      <van-button v-if="item.prescriptionId" type="default" round
+        >查看处方</van-button
+      >
+      <van-button type="primary" round :to="`/room?orderId=${item.id}`"
+        >继续沟通</van-button
+      >
+    </div>
+    <!-- 已完成 -->
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === EnumStateValue.completed"
+    >
+      <ConsultMore
+        :item="item"
+        @onDeleteOrder="onDeleteOrder(item)"
+        @originalPrescription="originalPrescription(item.prescriptionId || '')"
+      ></ConsultMore>
+      <van-button
+        v-if="item.prescriptionId"
+        type="default"
+        round
+        :to="`/room?orderId=${item.id}`"
+        >问诊记录</van-button
+      >
+      <van-button
+        v-if="item.evaluateId"
+        type="default"
+        round
+        :to="`/room?orderId=${item.id}`"
+        >查看评价</van-button
+      >
+      <van-button v-else type="primary" round :to="`/room?orderId=${item.id}`"
+        >写评价</van-button
+      >
+    </div>
+    <!-- 已取消 -->
+    <div class="detail-action van-hairline--top" v-if="item.status === 5">
+      <van-button
+        type="default"
+        round
+        @click="onDeleteOrder(item)"
+        :loading="deleteLoading"
+        >删除订单</van-button
+      >
+      <van-button type="primary" round :to="`/`">咨询其他医生</van-button>
     </div>
   </div>
   <div class="consult-detail-page" v-else>

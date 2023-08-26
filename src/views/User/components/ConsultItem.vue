@@ -7,8 +7,9 @@ import { ref } from "vue";
 import { showToast } from "vant";
 import { start } from "nprogress";
 import { apiCancelOrder, apiDeleteOrder } from "@/services/rapidConsultation";
-import { useLookPrescription } from "@/composables";
+import { useLookPrescription, useOnDeleteOrder } from "@/composables";
 import ConsultMore from "@/components/ConsultMore.vue";
+import { useCancelConsultation } from "@/composables";
 
 const props = defineProps<{
   item: TypeOrderItem;
@@ -17,8 +18,12 @@ const emit = defineEmits<{
   (e: "deleteId", id: string): void;
 }>();
 const showPopover = ref(false);
-const loading = ref<boolean>(false);
 const { originalPrescription } = useLookPrescription();
+const { cancelConsultation, loading } = useCancelConsultation();
+const { onDeleteOrder, loading: deleteLoading } = useOnDeleteOrder(() => {
+  emit("deleteId", props.item.id);
+});
+
 const actions = computed(() => {
   return [
     { text: "查看处方", disabled: !props.item.prescriptionId },
@@ -34,33 +39,19 @@ const onSelect = (action: { text: string }, i: number) => {
     originalPrescription(props.item.prescriptionId || "");
   }
 };
-// 取消问诊按钮
-const cancelConsultation = async (item: TypeOrderItem) => {
-  try {
-    loading.value = true;
-    await apiCancelOrder(item.id);
-    item.status = EnumStateValue.canceled;
-    item.statusValue = "已取消";
-    showToast("取消成功");
-  } catch {
-    showToast("取消失败");
-  } finally {
-    loading.value = false;
-  }
-};
 // 删除订单按钮
-const onDeleteOrder = async (item: TypeOrderItem) => {
-  try {
-    loading.value = true;
-    await apiDeleteOrder(item.id);
-    emit("deleteId", item.id);
-    showToast("删除成功");
-  } catch {
-    showToast("删除失败");
-  } finally {
-    loading.value = false;
-  }
-};
+// const onDeleteOrder = async (item: TypeOrderItem) => {
+//   try {
+//     loading.value = true;
+//     await apiDeleteOrder(item.id);
+//     emit("deleteId", item.id);
+//     showToast("删除成功");
+//   } catch {
+//     showToast("删除失败");
+//   } finally {
+//     loading.value = false;
+//   }
+// };
 </script>
 
 <template>
@@ -184,6 +175,7 @@ const onDeleteOrder = async (item: TypeOrderItem) => {
         plain
         size="small"
         round
+        :loading="deleteLoading"
         @click="onDeleteOrder(item)"
         >删除订单</van-button
       >

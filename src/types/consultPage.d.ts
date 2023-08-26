@@ -58,6 +58,7 @@ export type TypeOrderItem = {
   countdown?: number;
   payment: number;
   evaluateFlag?: number;
+  evaluateId?: number;
   couponDeduction: number;
   pointDeduction: number;
   actualPayment: number;
