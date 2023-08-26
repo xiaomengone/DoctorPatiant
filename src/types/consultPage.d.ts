@@ -18,6 +18,7 @@ export type TypePatientInfo = {
   idCard: string;
   gender: number;
   age: string;
+  genderValue: string;
 };
 export type TypeDocInfo = {
   id?: string;
@@ -57,6 +58,9 @@ export type TypeOrderItem = {
   countdown?: number;
   payment: number;
   evaluateFlag?: number;
+  couponDeduction: number;
+  pointDeduction: number;
+  actualPayment: number;
 };
 export type TypeOrderList = {
   total: number;

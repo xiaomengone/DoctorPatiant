@@ -45,6 +45,12 @@ const onLoad = () => {
       console.log("获取失败");
     });
 };
+const deleteId = (id: string) => {
+  OrderListArr.value = OrderListArr.value.filter((item) => {
+    item.id !== id;
+  });
+  onLoad();
+};
 </script>
 
 <template>
@@ -55,7 +61,12 @@ const onLoad = () => {
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <consultItem v-for="item in OrderListArr" :key="item.id" :item="item" />
+      <consultItem
+        v-for="item in OrderListArr"
+        :key="item.id"
+        :item="item"
+        @deleteId="deleteId"
+      />
     </van-list>
   </div>
 </template>

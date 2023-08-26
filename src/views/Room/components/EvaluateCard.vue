@@ -44,11 +44,9 @@ const onSubmit = async () => {
         docId: consult?.value.docInfo.id,
       });
       const res = await apiOrderEvaluate(reqValue.value);
-      console.log("res", res);
       completeEva && completeEva(score.value);
       showToast("评价成功，2秒后跳转到问诊记录页面");
       timer = setTimeout(() => {
-        console.log("执行了");
         router.push("/user/consult");
       }, 2000);
     }

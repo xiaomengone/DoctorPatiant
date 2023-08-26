@@ -105,6 +105,13 @@ const router = createRouter({
         title: "问诊记录",
       },
     },
+    {
+      path: "/user/consultDtail",
+      component: () => import("@/views/User/consultDtail.vue"),
+      meta: {
+        title: "问诊详情",
+      },
+    },
   ],
 });
 //路由前置守卫控制权限

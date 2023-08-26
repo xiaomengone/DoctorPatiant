@@ -21,9 +21,7 @@ const reRust = ref<ReqQuery>({
 
 const list = async () => {
   const res = await apiGetKnowledge(reRust.value);
-  console.log(22, res.data);
   lists.value.push(...res.data.rows);
-  console.log(111, lists.value);
 };
 // 滑动到底部时
 const onLoad = async () => {

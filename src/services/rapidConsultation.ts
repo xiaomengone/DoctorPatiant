@@ -53,8 +53,22 @@ const apiOrderEvaluate = (e: TypeOrderEvaluate) => {
     anonymousFlag: e.anonymousFlag,
   });
 };
-
+// 取消订单
+const apiCancelOrder = (id: string) => {
+  request<{
+    msg: string;
+    code: number;
+    success: true;
+    data: Object;
+  }>(`/patient/order/cancel/${id}`, "PUT");
+};
+// 删除订单
+const apiDeleteOrder = (id: string) => {
+  return request(`/patient/order/${id}`, "DELETE");
+};
 export {
+  apiDeleteOrder,
+  apiCancelOrder,
   apiOrderEvaluate,
   getConsultOrderDetail,
   apiGetDepAll,

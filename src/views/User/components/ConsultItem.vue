@@ -1,12 +1,66 @@
 <script setup lang="ts">
 import type { TypeOrderItem } from "@/types/consultPage";
-import { EnumStateValue } from "@/enums";
+import { EnumStateValue, OrderType } from "@/enums";
 import router from "@/router";
 import { computed } from "vue";
+import { ref } from "vue";
+import { showToast } from "vant";
+import { start } from "nprogress";
+import { apiCancelOrder, apiDeleteOrder } from "@/services/rapidConsultation";
+import { useLookPrescription } from "@/composables";
+import ConsultMore from "@/components/ConsultMore.vue";
 
-defineProps<{
+const props = defineProps<{
   item: TypeOrderItem;
 }>();
+const emit = defineEmits<{
+  (e: "deleteId", id: string): void;
+}>();
+const showPopover = ref(false);
+const loading = ref<boolean>(false);
+const { originalPrescription } = useLookPrescription();
+const actions = computed(() => {
+  return [
+    { text: "查看处方", disabled: !props.item.prescriptionId },
+    { text: "删除订单" },
+  ];
+});
+
+const onSelect = (action: { text: string }, i: number) => {
+  if (i === 1) {
+    onDeleteOrder(props.item);
+  }
+  if (i === 0) {
+    originalPrescription(props.item.prescriptionId || "");
+  }
+};
+// 取消问诊按钮
+const cancelConsultation = async (item: TypeOrderItem) => {
+  try {
+    loading.value = true;
+    await apiCancelOrder(item.id);
+    item.status = EnumStateValue.canceled;
+    item.statusValue = "已取消";
+    showToast("取消成功");
+  } catch {
+    showToast("取消失败");
+  } finally {
+    loading.value = false;
+  }
+};
+// 删除订单按钮
+const onDeleteOrder = async (item: TypeOrderItem) => {
+  try {
+    loading.value = true;
+    await apiDeleteOrder(item.id);
+    emit("deleteId", item.id);
+    showToast("删除成功");
+  } catch {
+    showToast("删除失败");
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -16,7 +70,10 @@ defineProps<{
       <p>{{ item.docInfo?.name || "暂无医生接诊" }}</p>
       <span>{{ item.statusValue }}</span>
     </div>
-    <div class="body" @click="router.push(`/user/consultDtail/${item.id}`)">
+    <div
+      class="body"
+      @click="router.push(`/user/consultDtail?itemId=${item.id}`)"
+    >
       <div class="body-row">
         <div class="body-label">病情描述</div>
         <div class="body-value">{{ item.illnessDesc }}</div>
@@ -33,7 +90,16 @@ defineProps<{
     <!-- 不同状态，下面的操作不同 -->
     <!-- 待支付状态 -->
     <div class="foot" v-if="item.status === EnumStateValue.toBePaid">
-      <van-button class="gray" plain size="small" round>取消问诊</van-button>
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
+        @click="cancelConsultation(item)"
+        loading-text="加载中..."
+        :loading="loading"
+        >取消问诊</van-button
+      >
       <van-button
         type="primary"
         plain
@@ -48,7 +114,14 @@ defineProps<{
       class="foot"
       v-if="item.status === EnumStateValue.waitingForConsultation"
     >
-      <van-button class="gray" plain size="small" round>取消问诊</van-button>
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
+        @click="cancelConsultation(item)"
+        >取消问诊</van-button
+      >
       <van-button
         type="primary"
         plain
@@ -66,6 +139,7 @@ defineProps<{
         size="small"
         round
         v-if="item.prescriptionId"
+        @click="originalPrescription(props.item.prescriptionId || '')"
         >查看处方</van-button
       >
       <van-button
@@ -79,19 +153,21 @@ defineProps<{
     </div>
     <!-- 已完成状态 -->
     <div class="foot" v-if="item.status === EnumStateValue.completed">
-      <div class="more">更多</div>
+      <ConsultMore
+        :item="item"
+        @originalPrescription="originalPrescription"
+        @onDeleteOrder="onDeleteOrder"
+      ></ConsultMore>
       <van-button
         class="gray"
         plain
         size="small"
         round
-        v-if="item.prescriptionId"
         @click="router.push(`/consult/room?orderId=${item.id}`)"
         >问诊记录</van-button
       >
-      <van-button type="primary" plain size="small" round v-else
-        >写评价</van-button
-      >
+      <van-button type="primary" plain size="small" round>写评价</van-button>
+
       <van-button
         type="primary"
         plain
@@ -103,8 +179,20 @@ defineProps<{
     </div>
     <!-- 已取消状态 -->
     <div class="foot" v-if="item.status === EnumStateValue.canceled">
-      <van-button class="gray" plain size="small" round>删除订单</van-button>
-      <van-button type="primary" plain size="small" round
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
+        @click="onDeleteOrder(item)"
+        >删除订单</van-button
+      >
+      <van-button
+        type="primary"
+        plain
+        size="small"
+        round
+        @click="router.push('/')"
         >咨询其他医生</van-button
       >
     </div>

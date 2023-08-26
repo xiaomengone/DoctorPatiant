@@ -18,8 +18,6 @@ const sendMsg = () => {
 };
 
 const sendImage: UploaderAfterRead = async (data) => {
-  console.log(1111);
-
   if (Array.isArray(data)) return;
   if (!data.file) return;
   const t = Toast.loading("正在上传");

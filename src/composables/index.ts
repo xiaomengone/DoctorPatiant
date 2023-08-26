@@ -1,7 +1,11 @@
-import { showToast } from "vant";
+import { showImagePreview, showToast } from "vant";
 import { ref } from "vue";
 import { apiPostLike } from "@/services/home";
 import type { resFollowDoctorsItem } from "@/types/home";
+import {
+  apiDeleteOrder,
+  apiGetPrescription,
+} from "@/services/rapidConsultation";
 
 // 封装关注逻辑
 const useFollowInterestLogic = () => {
@@ -23,4 +27,14 @@ const useFollowInterestLogic = () => {
   return { loading, followInterest };
 };
 
-export { useFollowInterestLogic };
+// 封装查看处方逻辑
+const useLookPrescription = () => {
+  const originalPrescription = async (id: string) => {
+    const res = await apiGetPrescription(id);
+    showImagePreview([res.data.url]);
+  };
+  return { originalPrescription };
+};
+// 封装删除问诊记录
+
+export { useFollowInterestLogic, useLookPrescription };

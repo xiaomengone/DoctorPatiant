@@ -7,24 +7,17 @@ import { useUserStore } from "@/stores";
 import dayjs from "dayjs";
 import { apiGetPrescription } from "@/services/rapidConsultation";
 import EvaluateCard from "@/views/Room/components/EvaluateCard.vue";
+import { useLookPrescription } from "@/composables";
+import { getIllnessTime, getConsultFlag } from "@/utils/filter";
 
 defineProps<{
   item: Message;
 }>();
 const store = useUserStore();
+const { originalPrescription } = useLookPrescription();
 
 const formatTime = (time: string) => {
   return dayjs(time).format("MM-DD");
-};
-const getIllnessTime = (time: number) => {
-  return optionList.find((item) => {
-    return item.value == time;
-  })?.label;
-};
-const getConsultFlag = (time: number) => {
-  return consultFlagList.find((item) => {
-    return item.value == time;
-  })?.label;
 };
 
 const clickLook = (
@@ -38,12 +31,6 @@ const clickLook = (
     return item.url;
   });
   showImagePreview(newArr);
-};
-const originalPrescription = async (id: string) => {
-  //查看医生原始处方
-  const res = await apiGetPrescription(id);
-  console.log("res", res.data.url);
-  showImagePreview([res.data.url]);
 };
 </script>
 
