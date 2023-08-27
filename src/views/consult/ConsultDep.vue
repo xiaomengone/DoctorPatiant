@@ -28,7 +28,6 @@ onMounted(() => {
         <van-sidebar-item :title="item.name" v-for="(item, index) in list" />
       </van-sidebar>
       <div class="sub-dep">
-        <!-- 123 -->
         <router-link
           to="/consult/illness"
           v-for="item in list[active]?.child"

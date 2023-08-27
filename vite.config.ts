@@ -8,6 +8,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: "/DoctorPatiant/dist",
   plugins: [
     vue(),
     Components({
