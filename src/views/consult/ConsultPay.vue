@@ -57,8 +57,11 @@ const next = async () => {
     orderGoodsId.value = res.data.id;
     store.deletePatientInformation();
     reqPostConsultPay.value.orderId = orderGoodsId.value;
-    reqPostConsultPay.value.payCallback = "http:localhost:5173/consult/room"; //回跳地址，问诊页面
+    reqPostConsultPay.value.payCallback = `${
+      import.meta.env.VITE_APP_CALLBACK
+    }/consult/room`; //回跳地址，问诊页面
     reqPostConsultPay.value.paymentMethod = paymentMethod.value || 1;
+    console.log("location.host", window.location.host);
   } else {
     showToast("请勾选用户协议");
   }
