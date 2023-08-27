@@ -15,7 +15,7 @@
     <main>
       技术栈
       <div class="item">
-        Vue3 、Vant、 Pinia 、VueRouter 、vueUse、async,await
+        Vue3 、TS、Vant、 Pinia 、VueRouter 、vueUse、async,await
       </div>
     </main>
     <footer>
