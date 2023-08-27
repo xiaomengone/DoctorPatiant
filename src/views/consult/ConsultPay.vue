@@ -31,7 +31,7 @@ const agree = ref<boolean>(false);
 const show = ref<boolean>(false);
 const orderGoodsId = ref<string>(); //订单ID
 const paymentMethod = ref<0 | 1>(1); //支付方式
-const payUrl = ref<string>(); //回跳地址
+const payUrl = ref<string>(); //支付成功后的跳转地址
 const router = useRouter();
 const reqPostConsultPay = ref<reqPaymentMethod>({
   orderId: "",

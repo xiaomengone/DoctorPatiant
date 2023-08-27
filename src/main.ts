@@ -10,3 +10,5 @@ const app = createApp(App);
 app.use(router);
 app.use(pinia);
 app.mount("#app");
+
+console.log("所在环境", import.meta.env.VITE_APP_CALLBACK);
