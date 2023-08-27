@@ -4,7 +4,7 @@ import ConsultList from "./components/ConsultList.vue";
 import { enumConsultationConsultation } from "@/enums";
 import { useRouter } from "vue-router";
 
-const active = ref<enumConsultationConsultation>(1);
+const active = ref<enumConsultationConsultation>(2);
 const router = useRouter();
 
 const back = () => {

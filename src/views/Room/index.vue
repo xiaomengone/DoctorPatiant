@@ -140,6 +140,7 @@ onUnmounted(() => {
       @getMsg="ongetMsg"
       @send-image="sendImage"
     ></RoomAction>
+    <div>此功能首先要在测试医生端发起对话</div>
   </div>
 </template>
 

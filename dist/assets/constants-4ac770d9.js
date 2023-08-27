@@ -1,0 +1,1 @@
+import{b as l}from"./index-32ed2876.js";const a=[{label:"一周内",value:l.week},{label:"一月内",value:l.months},{label:"半年内",value:l.halfYear},{label:"半年以上",value:l.year}],s=[{label:"未就诊",value:0},{label:"就诊过",value:1}];export{s as c,a as o};

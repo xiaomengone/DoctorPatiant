@@ -38,6 +38,7 @@ const reqPostConsultPay = ref<reqPaymentMethod>({
   paymentMethod: 1,
   payCallback: "",
 });
+const originalURL = window.location.host;
 
 // 获取预支付信息
 const getPreOrderIMG = async (e: QeqOrderpreType) => {
@@ -51,17 +52,19 @@ const getPatianMsg = async (id: string) => {
   patientMsg.value = res.data;
 };
 const next = async () => {
+  console.log("originalURL", originalURL);
+
   if (agree.value) {
     show.value = true;
     const res = await apiPostConsultorder(store.patientInformation);
     orderGoodsId.value = res.data.id;
     store.deletePatientInformation();
     reqPostConsultPay.value.orderId = orderGoodsId.value;
-    reqPostConsultPay.value.payCallback = `${
-      import.meta.env.VITE_APP_CALLBACK
-    }/consult/room`; //回跳地址，问诊页面
+    // reqPostConsultPay.value.payCallback = `${
+    //   import.meta.env.VITE_APP_CALLBACK
+    // }/consult/room`; //回跳地址，问诊页面
+    reqPostConsultPay.value.payCallback = `http:${originalURL}/DoctorPatiant/dist/consult/room`; //回跳地址，问诊页面
     reqPostConsultPay.value.paymentMethod = paymentMethod.value || 1;
-    console.log("location.host", window.location.host);
   } else {
     showToast("请勾选用户协议");
   }
